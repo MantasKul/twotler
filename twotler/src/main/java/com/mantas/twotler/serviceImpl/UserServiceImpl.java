@@ -1,5 +1,8 @@
 package com.mantas.twotler.serviceImpl;
 
+import com.mantas.twotler.JWT.JwtFilter;
+import com.mantas.twotler.JWT.JwtUtil;
+import com.mantas.twotler.JWT.UsersDetailsService;
 import com.mantas.twotler.constants.TwotlerConstants;
 import com.mantas.twotler.dao.UserDao;
 import com.mantas.twotler.model.User;
@@ -9,6 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -20,6 +26,15 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserDao userDao;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    UsersDetailsService usersDetailsService;
+
+    @Autowired
+    JwtUtil jwtUtil;
 
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
@@ -41,6 +56,32 @@ public class UserServiceImpl implements UserService {
         }
 
         return TwotlerUtils.getResponseEntity(TwotlerConstants.SOMETHING_WENT_WRONG + " at UserServiceImpl", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> login(Map<String, String> requestMap) {
+        log.info("Inside login");
+        try {
+            log.info("Inside try/catch");
+            // extracting email and pass from requestMap
+            Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(requestMap.get("email"), requestMap.get("password")));
+            // if user is authenticated
+            if (auth.isAuthenticated()) {
+                log.info("Inside first if");
+                // If user is approved (possibly will be removed with status column)
+                if(usersDetailsService.getUserDetail().getStatus().equalsIgnoreCase("true")) {
+                    log.info("Inside second if");
+                    return new ResponseEntity<String>("{\"token\":\"" + jwtUtil.generateToken(usersDetailsService.getUserDetail().getEmail(),usersDetailsService.getUserDetail().getRole()) + "\"}", HttpStatus.OK);
+                } else {
+                    log.info("Inside else");
+                    return new ResponseEntity<String>("{\"message\":\"" + " Wait for admin approval."+"\"}", HttpStatus.BAD_REQUEST);
+                }
+            }
+        } catch(Exception e) {
+            log.error("{}", e);
+        }
+
+        return new ResponseEntity<String>("{\"message\":\"" + "Bad Credentials."+"\"}", HttpStatus.BAD_REQUEST);
     }
 
     private boolean validateSignUpMap(Map<String, String> requestMap) {

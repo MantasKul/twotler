@@ -23,6 +23,9 @@ public class User implements Serializable {
     private String name;
     private String email;
     private String password;
+    // These two variables will be removed in the future if not needed
+    private String role;
+    private String status;
 
 
 }
