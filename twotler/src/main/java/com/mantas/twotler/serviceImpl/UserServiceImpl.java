@@ -1,7 +1,7 @@
 package com.mantas.twotler.serviceImpl;
 
-import com.mantas.twotler.JWT.JwtFilter;
 import com.mantas.twotler.JWT.JwtUtil;
+import com.mantas.twotler.JWT.SecurityConfig;
 import com.mantas.twotler.JWT.UsersDetailsService;
 import com.mantas.twotler.constants.TwotlerConstants;
 import com.mantas.twotler.dao.UserDao;
@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -60,11 +61,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<String> login(Map<String, String> requestMap) {
-        log.info("Inside login");
+        log.info("Inside login {}", requestMap); // remove email and pass printing
         try {
             log.info("Inside try/catch");
             // extracting email and pass from requestMap
-            Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(requestMap.get("email"), requestMap.get("password")));
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(requestMap.get("email"), requestMap.get("password"));
+            Authentication auth = authenticationManager.authenticate(authenticationToken);
+            log.info(auth.toString());
             // if user is authenticated
             if (auth.isAuthenticated()) {
                 log.info("Inside first if");

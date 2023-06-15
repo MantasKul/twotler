@@ -8,9 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 
 @Service
@@ -40,14 +37,15 @@ public class JwtUtil {
     }
 
     public String generateToken(String username, String role) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
-        return createToken(claims, username);
+        System.out.println("Inside generateToken");
+//        Map<String, Object> claims = new HashMap<>();
+//        claims.put("role", role);
+        return createToken(username);
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
+    private String createToken(String subject) {
+        System.out.println("Inside createToken");
         return Jwts.builder()
-                .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * TwotlerConstants.JWT_TOKEN_VALIDITY))

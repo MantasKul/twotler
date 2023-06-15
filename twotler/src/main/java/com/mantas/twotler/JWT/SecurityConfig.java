@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,19 +41,18 @@ public class SecurityConfig {
 
     // this method is replacing the above configure method, if something doesn't work check here as I might be using wrong replacement
     @Bean
-    public UserDetailsManager users(DataSource dataSource) {
-        if(userDetailsService.getUserDetail() != null) {
-            UserDetails user = User.withDefaultPasswordEncoder()
-                    .username(userDetailsService.getUserDetail().getEmail())
-                    .password(userDetailsService.getUserDetail().getPassword())
-                    .roles(userDetailsService.getUserDetail().getRole())
-                    .build();
-            JdbcUserDetailsManager users = new JdbcUserDetailsManager(dataSource);
-            users.createUser(user);
+    public JwtFilter authenticationJwtTokenFilter() {
+        return new JwtFilter();
+    }
 
-            return users;
-        }
-        else return null;
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+
+        return authProvider;
     }
 
     @Bean
