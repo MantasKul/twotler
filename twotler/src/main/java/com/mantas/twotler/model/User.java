@@ -8,8 +8,9 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.io.Serializable;
 
 @NamedQuery(name = "User.findByEmailId", query = "SELECT u from User u where u.email=:email")
+@NamedQuery(name = "User.getAllUsers", query = "SELECT new com.mantas.twotler.wrapper.UserWrapper(u.id, u.name, u.email, u.role, u.status) from User u WHERE u.role='user'")
 
-@Data // lombok, takes care of getters/setters. default constructor
+@Data // lombok, takes care of getters/setters, default constructor
 @Entity
 @DynamicInsert
 @DynamicUpdate

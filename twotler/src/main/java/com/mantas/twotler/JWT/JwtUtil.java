@@ -8,12 +8,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 @Service
 public class JwtUtil {
 
-    private String secret = "twotlersecret";
+    private String SECRET_KEY = "twotlersecret";
 
     public String extractUsername(String token) {
         return extractClaims(token, Claims::getSubject);
@@ -29,7 +31,7 @@ public class JwtUtil {
     }
 
     public Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJwt(token).getBody();
+        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -38,18 +40,19 @@ public class JwtUtil {
 
     public String generateToken(String username, String role) {
         System.out.println("Inside generateToken");
-//        Map<String, Object> claims = new HashMap<>();
-//        claims.put("role", role);
-        return createToken(username);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", role);
+        return createToken(username, claims);
     }
 
-    private String createToken(String subject) {
+    private String createToken(String subject, Map<String, Object> claims) {
         System.out.println("Inside createToken");
         return Jwts.builder()
+                .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * TwotlerConstants.JWT_TOKEN_VALIDITY))
-                .signWith(SignatureAlgorithm.HS256, secret).compact();
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {

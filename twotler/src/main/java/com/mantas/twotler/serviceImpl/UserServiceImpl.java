@@ -1,5 +1,6 @@
 package com.mantas.twotler.serviceImpl;
 
+import com.mantas.twotler.JWT.JwtFilter;
 import com.mantas.twotler.JWT.JwtUtil;
 import com.mantas.twotler.JWT.SecurityConfig;
 import com.mantas.twotler.JWT.UsersDetailsService;
@@ -8,6 +9,7 @@ import com.mantas.twotler.dao.UserDao;
 import com.mantas.twotler.model.User;
 import com.mantas.twotler.serice.UserService;
 import com.mantas.twotler.utils.TwotlerUtils;
+import com.mantas.twotler.wrapper.UserWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -36,6 +40,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     JwtUtil jwtUtil;
+    @Autowired
+    JwtFilter jwtFilter;
 
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
@@ -61,22 +67,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<String> login(Map<String, String> requestMap) {
-        log.info("Inside login {}", requestMap); // remove email and pass printing
         try {
-            log.info("Inside try/catch");
             // extracting email and pass from requestMap
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(requestMap.get("email"), requestMap.get("password"));
             Authentication auth = authenticationManager.authenticate(authenticationToken);
-            log.info(auth.toString());
             // if user is authenticated
             if (auth.isAuthenticated()) {
-                log.info("Inside first if");
                 // If user is approved (possibly will be removed with status column)
                 if(usersDetailsService.getUserDetail().getStatus().equalsIgnoreCase("true")) {
-                    log.info("Inside second if");
                     return new ResponseEntity<String>("{\"token\":\"" + jwtUtil.generateToken(usersDetailsService.getUserDetail().getEmail(),usersDetailsService.getUserDetail().getRole()) + "\"}", HttpStatus.OK);
                 } else {
-                    log.info("Inside else");
                     return new ResponseEntity<String>("{\"message\":\"" + " Wait for admin approval."+"\"}", HttpStatus.BAD_REQUEST);
                 }
             }
@@ -85,6 +85,25 @@ public class UserServiceImpl implements UserService {
         }
 
         return new ResponseEntity<String>("{\"message\":\"" + "Bad Credentials."+"\"}", HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    public ResponseEntity<List<UserWrapper>> getAllUser() {
+        try {
+            if(jwtFilter.isAdmin()){
+                return new ResponseEntity<>(userDao.getAllUsers(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> update(Map<String, String> requestMap) {
+
     }
 
     private boolean validateSignUpMap(Map<String, String> requestMap) {
@@ -98,6 +117,8 @@ public class UserServiceImpl implements UserService {
         user.setName(requestMap.get("name"));
         user.setEmail(requestMap.get("email"));
         user.setPassword(requestMap.get("password"));
+        user.setRole("user");
+        user.setStatus("true");
 
         return user;
     }
