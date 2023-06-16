@@ -8,6 +8,7 @@ import com.mantas.twotler.constants.TwotlerConstants;
 import com.mantas.twotler.dao.UserDao;
 import com.mantas.twotler.model.User;
 import com.mantas.twotler.serice.UserService;
+import com.mantas.twotler.utils.EmailUtils;
 import com.mantas.twotler.utils.TwotlerUtils;
 import com.mantas.twotler.wrapper.UserWrapper;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,8 @@ public class UserServiceImpl implements UserService {
     JwtUtil jwtUtil;
     @Autowired
     JwtFilter jwtFilter;
+    @Autowired
+    EmailUtils emailUtils;
 
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
@@ -105,6 +108,7 @@ public class UserServiceImpl implements UserService {
                 Optional<User> optional = userDao.findById(Integer.parseInt(requestMap.get("id")));
                 if(!optional.isEmpty()) {
                     userDao.updateStatus(requestMap.get("status"), Integer.parseInt(requestMap.get("id")));
+                    sendEmailToAllAdmin(requestMap.get("status"), optional.get().getEmail(), userDao.getAllAdmin());
                     return TwotlerUtils.getResponseEntity("User with an id " + requestMap.get("id") + " has been updated successfully", HttpStatus.OK);
                 } else {
                     return TwotlerUtils.getResponseEntity("User with " + requestMap.get("id") + " id doesn't exist", HttpStatus.OK);
@@ -133,5 +137,14 @@ public class UserServiceImpl implements UserService {
         user.setStatus("true");
 
         return user;
+    }
+
+    private void sendEmailToAllAdmin(String status, String email, List<String> allAdmin) {
+        allAdmin.remove(jwtFilter.getCurrentUser());    // Removes the user which is changing the status
+        if(status != null && status.equalsIgnoreCase("true")) {
+            emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Approved", "USER:- " + email+"\n is approved by \nADMIN:-"+jwtFilter.getCurrentUser(), allAdmin);
+        } else {
+            emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Disabled", "USER:- " + email+"\n is disabled by \nADMIN:-"+jwtFilter.getCurrentUser(), allAdmin);
+        }
     }
 }
