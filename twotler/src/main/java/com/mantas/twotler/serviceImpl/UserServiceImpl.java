@@ -20,10 +20,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -103,7 +100,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<String> update(Map<String, String> requestMap) {
-
+        try {
+            if(jwtFilter.isAdmin()) {
+                Optional<User> optional = userDao.findById(Integer.parseInt(requestMap.get("id")));
+                if(!optional.isEmpty()) {
+                    userDao.updateStatus(requestMap.get("status"), Integer.parseInt(requestMap.get("id")));
+                    return TwotlerUtils.getResponseEntity("User with an id " + requestMap.get("id") + " has been updated successfully", HttpStatus.OK);
+                } else {
+                    return TwotlerUtils.getResponseEntity("User with " + requestMap.get("id") + " id doesn't exist", HttpStatus.OK);
+                }
+            } else {
+                return TwotlerUtils.getResponseEntity(TwotlerConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return TwotlerUtils.getResponseEntity(TwotlerConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private boolean validateSignUpMap(Map<String, String> requestMap) {

@@ -9,6 +9,7 @@ import java.io.Serializable;
 
 @NamedQuery(name = "User.findByEmailId", query = "SELECT u from User u where u.email=:email")
 @NamedQuery(name = "User.getAllUsers", query = "SELECT new com.mantas.twotler.wrapper.UserWrapper(u.id, u.name, u.email, u.role, u.status) from User u WHERE u.role='user'")
+@NamedQuery(name = "User.updateStatus", query = "UPDATE User u SET u.status=:status WHERE u.id=:id")
 
 @Data // lombok, takes care of getters/setters, default constructor
 @Entity
