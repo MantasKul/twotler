@@ -17,4 +17,7 @@ public interface UserDao extends JpaRepository<User, Integer> {
     @Transactional
     @Modifying
     Integer updateStatus(@Param("status") String status, @Param("id") Integer id);
+
+    // Behind the scenes, Data JPA will create SQL queries based on the finder method and execute the query for us thus it's not needed to be manually implemented
+    User findByEmail(String email);
 }

@@ -7,6 +7,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.io.Serializable;
 
+// These querys are loaded with the app instead of everytime they're used
 @NamedQuery(name = "User.findByEmailId", query = "SELECT u from User u where u.email=:email")
 @NamedQuery(name = "User.getAllUsers", query = "SELECT new com.mantas.twotler.wrapper.UserWrapper(u.id, u.name, u.email, u.role, u.status) from User u WHERE u.role='user'")
 @NamedQuery(name = "User.updateStatus", query = "UPDATE User u SET u.status=:status WHERE u.id=:id")
@@ -26,8 +27,9 @@ public class User implements Serializable {
     private String name;
     private String email;
     private String password;
-    // These two variables will be removed in the future if not needed
-    private String role;
-    private String status;
+    // private String displayName; // might implement in the future
+    // One could be used as verified/non-verified acc, atm they're used for learning purposes
+    private String role;    // User/admin
+    private String status;  // Active/not active (true/false)
 
 }

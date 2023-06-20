@@ -24,4 +24,11 @@ public interface UserRest {
 
     @PostMapping("/update")
     public ResponseEntity<String> update(@RequestBody(required = true) Map<String, String> requestMap);
+
+    // Use this when trying to move from one page to another, will return 403 if the token is not valid
+    @GetMapping("/checkToken")
+    public ResponseEntity<String> checkToken();
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<String> changePassword(@RequestBody Map<String, String> requestMap);
 }

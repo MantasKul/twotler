@@ -39,19 +39,17 @@ public class JwtUtil {
     }
 
     public String generateToken(String username, String role) {
-        System.out.println("Inside generateToken");
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
         return createToken(username, claims);
     }
 
     private String createToken(String subject, Map<String, Object> claims) {
-        System.out.println("Inside createToken");
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * TwotlerConstants.JWT_TOKEN_VALIDITY))
+                .setExpiration(new Date(System.currentTimeMillis() + TwotlerConstants.JWT_TOKEN_VALIDITY))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
     }
 

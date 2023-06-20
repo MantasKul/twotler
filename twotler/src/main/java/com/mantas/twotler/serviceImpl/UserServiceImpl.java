@@ -45,10 +45,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
-        log.info("Inside signup {}", requestMap);
         try {
+            // Check if email/name/password has been entered
             if (validateSignUpMap(requestMap)) {
                 User user = userDao.findByEmailId(requestMap.get("email"));
+                // check if such email already exists in database
                 if (Objects.isNull(user)) {
                     userDao.save(getUserFromMap(requestMap));
                     return TwotlerUtils.getResponseEntity("Sign Up Successful!", HttpStatus.OK);
@@ -62,7 +63,7 @@ public class UserServiceImpl implements UserService {
             e.printStackTrace();
         }
 
-        return TwotlerUtils.getResponseEntity(TwotlerConstants.SOMETHING_WENT_WRONG + " at UserServiceImpl", HttpStatus.INTERNAL_SERVER_ERROR);
+        return TwotlerUtils.getResponseEntity(TwotlerConstants.SOMETHING_WENT_WRONG + " at UserServiceImpl signUp", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
@@ -101,6 +102,7 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    // Update status of the user. Only an admin can do that
     @Override
     public ResponseEntity<String> update(Map<String, String> requestMap) {
         try {
@@ -117,6 +119,31 @@ public class UserServiceImpl implements UserService {
                 return TwotlerUtils.getResponseEntity(TwotlerConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
             }
         } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return TwotlerUtils.getResponseEntity(TwotlerConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> checkToken() {
+        return TwotlerUtils.getResponseEntity("true", HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<String> changePassword(Map<String, String> requestMap) {
+        try {
+            User user = userDao.findByEmail(jwtFilter.getCurrentUser());
+
+            if(!user.equals(null)) {
+                if(user.getPassword().equals(requestMap.get("oldPassword"))) {
+                    user.setPassword(requestMap.get("newPassword"));
+                    userDao.save(user);
+                    return TwotlerUtils.getResponseEntity("Password updated successfully", HttpStatus.OK);
+                }
+                return TwotlerUtils.getResponseEntity("Incorrect old password", HttpStatus.BAD_REQUEST);
+            }
+            return TwotlerUtils.getResponseEntity(TwotlerConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return TwotlerUtils.getResponseEntity(TwotlerConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
