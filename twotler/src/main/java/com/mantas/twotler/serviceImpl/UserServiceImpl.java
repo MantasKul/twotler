@@ -1,8 +1,8 @@
 package com.mantas.twotler.serviceImpl;
 
+import com.google.common.base.Strings;
 import com.mantas.twotler.JWT.JwtFilter;
 import com.mantas.twotler.JWT.JwtUtil;
-import com.mantas.twotler.JWT.SecurityConfig;
 import com.mantas.twotler.JWT.UsersDetailsService;
 import com.mantas.twotler.constants.TwotlerConstants;
 import com.mantas.twotler.dao.UserDao;
@@ -17,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -143,6 +142,22 @@ public class UserServiceImpl implements UserService {
                 return TwotlerUtils.getResponseEntity("Incorrect old password", HttpStatus.BAD_REQUEST);
             }
             return TwotlerUtils.getResponseEntity(TwotlerConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return TwotlerUtils.getResponseEntity(TwotlerConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> forgotPassword(Map<String, String> requestMap) {
+        try {
+            User user = userDao.findByEmail(requestMap.get("email"));
+
+            if(user != null && !Strings.isNullOrEmpty(user.getEmail())) {
+                emailUtils.forgotPasswordMail(user.getEmail(), "Credentials by Twotler System", user.getPassword());
+            }
+
+            return TwotlerUtils.getResponseEntity("Check your email for password", HttpStatus.OK); // We return "check email" msg for evey email doesn't matter if it exists or not for security reasons
         } catch (Exception e) {
             e.printStackTrace();
         }
