@@ -80,7 +80,7 @@ public class userRestImpl implements UserRest {
         } catch(Exception e) {
             e.printStackTrace();
         }
-        return TwotlerUtils.getResponseEntity(TwotlerConstants.SOMETHING_WENT_WRONG + " at userRestImpl", HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<String>("{\"message\":\"" + "Bad Credentials."+"\"}", HttpStatus.BAD_REQUEST);
     }
 
     @Override
