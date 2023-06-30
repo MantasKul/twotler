@@ -13,7 +13,8 @@ import { NgxUiLoaderModule, NgxUiLoaderConfig, SPINNER } from 'ngx-ui-loader';
 import { MatDialogModule } from '@angular/material/dialog'; 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon'; 
-import { MatFormFieldModule } from '@angular/material/form-field'; 
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { LoginComponent } from './login/login.component'; 
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   text: "Loading",
@@ -30,7 +31,8 @@ const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   declarations: [
     AppComponent,
     SignupComponent,
-    HomeComponent
+    HomeComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
