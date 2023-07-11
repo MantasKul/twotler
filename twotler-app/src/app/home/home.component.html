@@ -1,5 +1,20 @@
-<ul>
-    <li><a (click)="onSignup()">SignUp</a></li>
-    <li><a (click)="onLogin()">Login</a></li>
-    <li><a (click)="onLogout()">Logout</a></li>  
-</ul>
+<mat-grid-list cols="3">
+
+    <!-- Left column, login, signup, logout-->
+    <mat-grid-tile class="sides" style="background-color: aqua;">
+        <div class="column-left">
+            <ul>
+                <li><button mat-raised-button (click)="onSignup()">SignUp</button></li>
+                <li><button mat-raised-button (click)="onLogin()">Login</button></li>
+                <li><button mat-raised-button (click)="onLogout()">Logout</button></li>  
+            </ul>
+        </div>
+    </mat-grid-tile>
+
+    <!-- Middle column, twots and stuff-->
+    <mat-grid-tile class="mid">MID</mat-grid-tile>
+
+    <!-- Right column, yet to figure what will be here-->
+    <mat-grid-tile class="sides">RIGHT</mat-grid-tile>
+
+</mat-grid-list>

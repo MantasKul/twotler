@@ -1,0 +1,21 @@
+.column-left {
+    position: absolute;
+    right: 10px;
+    padding: 10px;
+}
+
+.sides {
+    width: 25%;
+}
+.mid {
+    width: 50%;
+}
+
+ul {
+    list-style-type: none;
+}
+button {
+    margin: 5px;
+    display: block;
+    width: 100%;
+}

@@ -3,6 +3,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { SignupComponent } from '../signup/signup.component';
 import { LoginComponent } from '../login/login.component';
 import { UserService } from '../services/user.service';
+import { GlobalConstants } from '../shared/global-constants';
 
 @Component({
   selector: 'app-home',
@@ -10,6 +11,8 @@ import { UserService } from '../services/user.service';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
+
+  logedin = localStorage.getItem('token');
 
   constructor(private dialog: MatDialog,
     private userService: UserService) { }

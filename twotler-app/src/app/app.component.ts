@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { GlobalConstants } from './shared/global-constants';
 
 @Component({
   selector: 'app-root',

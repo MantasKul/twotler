@@ -14,6 +14,9 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon'; 
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button'; 
+import { MatGridListModule } from '@angular/material/grid-list'; 
+
 import { LoginComponent } from './login/login.component'; 
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
@@ -44,7 +47,9 @@ const ngxUiLoaderConfig: NgxUiLoaderConfig = {
     MatIconModule,
     FormsModule,
     ReactiveFormsModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatGridListModule,
+    MatButtonModule
   ],
   providers: [],
   bootstrap: [AppComponent]
