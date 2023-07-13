@@ -41,8 +41,8 @@ export class LoginComponent implements OnInit {
       this.ngxService.stop();
       this.dialogRef.close();
       localStorage.setItem('token', response.token);
-      //this.router.navigate('/');
     }, (error) => {
+      this.ngxService.stop();
       if(error.error?.message) {
         this.responseMessage = error.error?.message;
       }
