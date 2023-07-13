@@ -24,6 +24,7 @@ export class HomeComponent implements OnInit {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = false;
     dialogConfig.autoFocus = true;
+    dialogConfig.width = "auto";
     this.dialog.open(SignupComponent, dialogConfig);
   }
 
@@ -31,6 +32,7 @@ export class HomeComponent implements OnInit {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = false;
     dialogConfig.autoFocus = true;
+    dialogConfig.width = "auto";
     this.dialog.open(LoginComponent, dialogConfig);
   }
 
