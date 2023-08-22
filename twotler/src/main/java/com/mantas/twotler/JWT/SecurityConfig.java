@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
@@ -34,12 +35,7 @@ public class SecurityConfig {
     @Autowired
     JwtFilter jwtFilter;
 
-//    @Override
-//    public void configure(AuthenticationmanagerBuilder auth) throws Exception {
-//        auth.userDetailsService(userDetailsService);
-//    }
 
-    // this method is replacing the above configure method, if something doesn't work check here as I might be using wrong replacement
     @Bean
     public JwtFilter authenticationJwtTokenFilter() {
         return new JwtFilter();
@@ -84,5 +80,10 @@ public class SecurityConfig {
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
     }
 }

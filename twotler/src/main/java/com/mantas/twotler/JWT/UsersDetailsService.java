@@ -17,12 +17,16 @@ public class UsersDetailsService implements UserDetailsService {
     @Autowired
     UserDao userDao;
 
+/*    @Autowired
+    SecurityConfig securityConfig;*/
+
     private com.mantas.twotler.model.User userDetail;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         userDetail = userDao.findByEmailId(email);
         if(!Objects.isNull(userDetail)) {
+            //String encodedPassword = securityConfig.encoder().encode(userDetail.getPassword());
             return new User(userDetail.getEmail(), userDetail.getPassword(), new ArrayList<>());
         }
         else throw new UsernameNotFoundException("User not found");

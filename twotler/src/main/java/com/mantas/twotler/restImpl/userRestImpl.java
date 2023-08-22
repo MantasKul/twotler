@@ -3,6 +3,7 @@ package com.mantas.twotler.restImpl;
 import com.google.common.base.Strings;
 import com.mantas.twotler.JWT.JwtFilter;
 import com.mantas.twotler.JWT.JwtUtil;
+import com.mantas.twotler.JWT.SecurityConfig;
 import com.mantas.twotler.JWT.UsersDetailsService;
 import com.mantas.twotler.constants.TwotlerConstants;
 import com.mantas.twotler.dao.UserDao;
@@ -42,6 +43,9 @@ public class userRestImpl implements UserRest {
     @Autowired
     EmailUtils emailUtils;
 
+    @Autowired
+    SecurityConfig securityConfig;
+
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
         try{
@@ -71,11 +75,14 @@ public class userRestImpl implements UserRest {
             int iterations = 10;  // number of hash iteration
             int hashWidth = 256;      // hash width in bits
 
-            Pbkdf2PasswordEncoder pbkdf2PasswordEncoder =
-                    new Pbkdf2PasswordEncoder(pepper, iterations, hashWidth, Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256);
-            pbkdf2PasswordEncoder.setEncodeHashAsBase64(true);
-            String encodedPassword = pbkdf2PasswordEncoder.encode(requestMap.get("password"));
+//            Pbkdf2PasswordEncoder pbkdf2PasswordEncoder =
+//                    new Pbkdf2PasswordEncoder(pepper, iterations, hashWidth, Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256);
+//            pbkdf2PasswordEncoder.setEncodeHashAsBase64(true);
+//            String encodedPassword = pbkdf2PasswordEncoder.encode(requestMap.get("password"));
+//
+//            System.out.println("HASHED PASS === " + encodedPassword);
 
+            String encodedPassword = securityConfig.encoder().encode(requestMap.get("password"));
             System.out.println("HASHED PASS === " + encodedPassword);
 
             // extracting email and pass from requestMap
@@ -188,17 +195,20 @@ public class userRestImpl implements UserRest {
         user.setName(requestMap.get("name"));
         user.setEmail(requestMap.get("email"));
 
-        System.out.println("Before hashing");
+//        System.out.println("Before hashing");
+//
+//        String pepper = "pepper"; // secret key used by password encoding
+//        int iterations = 10;  // number of hash iteration
+//        int hashWidth = 256;      // hash width in bits
+//
+//        Pbkdf2PasswordEncoder pbkdf2PasswordEncoder =
+//                new Pbkdf2PasswordEncoder(pepper, iterations, hashWidth, Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256);
+//        pbkdf2PasswordEncoder.setEncodeHashAsBase64(true);
+//        String encodedPassword = pbkdf2PasswordEncoder.encode(requestMap.get("password"));
+//
+//        System.out.println("HASHED PASS === " + encodedPassword);
 
-        String pepper = "pepper"; // secret key used by password encoding
-        int iterations = 10;  // number of hash iteration
-        int hashWidth = 256;      // hash width in bits
-
-        Pbkdf2PasswordEncoder pbkdf2PasswordEncoder =
-                new Pbkdf2PasswordEncoder(pepper, iterations, hashWidth, Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256);
-        pbkdf2PasswordEncoder.setEncodeHashAsBase64(true);
-        String encodedPassword = pbkdf2PasswordEncoder.encode(requestMap.get("password"));
-
+        String encodedPassword = securityConfig.encoder().encode(requestMap.get("password"));
         System.out.println("HASHED PASS === " + encodedPassword);
 
         user.setPassword(encodedPassword);
