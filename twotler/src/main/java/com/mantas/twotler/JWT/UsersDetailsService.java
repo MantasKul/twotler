@@ -35,4 +35,6 @@ public class UsersDetailsService implements UserDetailsService {
     public com.mantas.twotler.model.User getUserDetail() {
         return userDetail;
     }
+
+
 }

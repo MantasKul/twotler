@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -71,22 +72,19 @@ public class userRestImpl implements UserRest {
     @Override
     public ResponseEntity<String> login(Map<String, String> requestMap) {
         try {
-            String pepper = "pepper"; // secret key used by password encoding
-            int iterations = 10;  // number of hash iteration
-            int hashWidth = 256;      // hash width in bits
 
-//            Pbkdf2PasswordEncoder pbkdf2PasswordEncoder =
-//                    new Pbkdf2PasswordEncoder(pepper, iterations, hashWidth, Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256);
-//            pbkdf2PasswordEncoder.setEncodeHashAsBase64(true);
-//            String encodedPassword = pbkdf2PasswordEncoder.encode(requestMap.get("password"));
-//
-//            System.out.println("HASHED PASS === " + encodedPassword);
-
+            // This block of encoder match needs to be extracted into its own method
             String encodedPassword = securityConfig.encoder().encode(requestMap.get("password"));
-            System.out.println("HASHED PASS === " + encodedPassword);
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            if(!encoder.matches(requestMap.get("password"), getUserFromMap(requestMap).getPassword())) {
+                return new ResponseEntity<String>("Something went wrong at encoder matches", HttpStatus.BAD_REQUEST);
+            }
+            else {
+                System.out.println("Password matched");
+            }
 
             // extracting email and pass from requestMap
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(requestMap.get("email"), encodedPassword);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(requestMap.get("email"), requestMap.get("password"));
             Authentication auth = authenticationManager.authenticate(authenticationToken);
             // if user is authenticated
             if (auth.isAuthenticated()) {
@@ -195,21 +193,7 @@ public class userRestImpl implements UserRest {
         user.setName(requestMap.get("name"));
         user.setEmail(requestMap.get("email"));
 
-//        System.out.println("Before hashing");
-//
-//        String pepper = "pepper"; // secret key used by password encoding
-//        int iterations = 10;  // number of hash iteration
-//        int hashWidth = 256;      // hash width in bits
-//
-//        Pbkdf2PasswordEncoder pbkdf2PasswordEncoder =
-//                new Pbkdf2PasswordEncoder(pepper, iterations, hashWidth, Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256);
-//        pbkdf2PasswordEncoder.setEncodeHashAsBase64(true);
-//        String encodedPassword = pbkdf2PasswordEncoder.encode(requestMap.get("password"));
-//
-//        System.out.println("HASHED PASS === " + encodedPassword);
-
-        String encodedPassword = securityConfig.encoder().encode(requestMap.get("password"));
-        System.out.println("HASHED PASS === " + encodedPassword);
+        String encodedPassword = securityConfig.encoder().encode(requestMap.get("password"));;
 
         user.setPassword(encodedPassword);
         user.setRole("user");
